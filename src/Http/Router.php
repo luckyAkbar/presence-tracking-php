@@ -1,0 +1,47 @@
+<?php
+declare(strict_types=1);
+
+namespace App\Http;
+
+final class Router
+{
+    /** @var array<string, callable> */
+    private array $getRoutes = [];
+    /** @var callable|null */
+    private $fallbackHandler = null;
+
+    public function get(string $path, callable $handler): void
+    {
+        $this->getRoutes[$path] = $handler;
+    }
+
+    public function fallback(callable $handler): void
+    {
+        $this->fallbackHandler = $handler;
+    }
+
+    public function dispatch(): void
+    {
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+        if (!is_string($uri)) {
+            $uri = '/';
+        }
+
+        if ($method === 'GET' && isset($this->getRoutes[$uri])) {
+            ($this->getRoutes[$uri])();
+            return;
+        }
+
+        if ($this->fallbackHandler !== null) {
+            ($this->fallbackHandler)();
+            return;
+        }
+
+        http_response_code(404);
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'Not Found']);
+    }
+}
+
+

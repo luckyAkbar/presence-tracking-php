@@ -25,20 +25,8 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 # Clean up
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Security-focused PHP configuration
+# Security-focused PHP-FPM setting: restrict to only handle .php
 RUN set -eux; \
-    printf "\n; Security hardening\n"               > /usr/local/etc/php/conf.d/zzz-security.ini; \
-    printf "expose_php=0\n"                        >> /usr/local/etc/php/conf.d/zzz-security.ini; \
-    printf "display_errors=0\n"                    >> /usr/local/etc/php/conf.d/zzz-security.ini; \
-    printf "log_errors=1\n"                         >> /usr/local/etc/php/conf.d/zzz-security.ini; \
-    printf "cgi.fix_pathinfo=0\n"                   >> /usr/local/etc/php/conf.d/zzz-security.ini; \
-    printf "session.cookie_httponly=1\n"            >> /usr/local/etc/php/conf.d/zzz-security.ini; \
-    printf "session.use_strict_mode=1\n"            >> /usr/local/etc/php/conf.d/zzz-security.ini; \
-    printf "zend.assertions=-1\n"                   >> /usr/local/etc/php/conf.d/zzz-security.ini; \
-    printf "enable_dl=0\n"                           >> /usr/local/etc/php/conf.d/zzz-security.ini; \
-    printf "post_max_size=16M\n"                    >> /usr/local/etc/php/conf.d/zzz-security.ini; \
-    printf "upload_max_filesize=16M\n"              >> /usr/local/etc/php/conf.d/zzz-security.ini; \
-    # Restrict PHP-FPM to only handle .php
     sed -ri 's~^;?security\.limit_extensions = .*$~security.limit_extensions = .php~' /usr/local/etc/php-fpm.d/www.conf
 
 # Create uploads dir and set safe ownership/permissions
@@ -48,5 +36,7 @@ RUN set -eux; \
 
 COPY conf.d/20-security.ini /usr/local/etc/php/conf.d/20-security.ini
 
-# Drop root
-USER www-data
+# Expose FPM on 9000 as usual
+EXPOSE 9000
+
+# Keep default FPM user (www-data) configured in the base image
