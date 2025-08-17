@@ -6,9 +6,9 @@ services:
     volumes:
       - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./public:/var/www/html/public:ro
-    depends_on:
-      php:
-        condition: service_healthy
+    # depends_on:
+    #   php:
+    #     condition: service_healthy
     security_opt:
       - no-new-privileges:true
     cap_drop: ["ALL"]
@@ -19,14 +19,22 @@ services:
       context: ./docker/php
     working_dir: /var/www/html
     environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_NAME: presence
-      DB_USER: presence
-      DB_PASSWORD: presence_pass
+      APP_ENV: ${APP_ENV}
+      APP_BASE_URL: ${APP_BASE_URL}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
       COMPOSER_HOME: /tmp/composer
       COMPOSER_CACHE_DIR: /tmp/composer/cache
       COMPOSER_ALLOW_SUPERUSER: "1"
+      AUTH0_DOMAIN: ${AUTH0_DOMAIN}
+      AUTH0_CLIENT_ID: ${AUTH0_CLIENT_ID}
+      AUTH0_CLIENT_SECRET: ${AUTH0_CLIENT_SECRET}
+      AUTH0_COOKIE_SECRET: ${AUTH0_COOKIE_SECRET}
+      AUTH0_REDIRECT_URI: ${AUTH0_REDIRECT_URI}
+      AUTH0_LOGOUT_REDIRECT_URI: ${AUTH0_LOGOUT_REDIRECT_URI}
     volumes:
       - ./:/var/www/html
     read_only: true
@@ -41,15 +49,15 @@ services:
   mysql:
     image: mysql:8.4
     environment:
-      MYSQL_DATABASE: presence
-      MYSQL_USER: presence
-      MYSQL_PASSWORD: presence_pass
-      MYSQL_ROOT_PASSWORD: root_pass
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - db_data:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -proot_pass --silent || exit 1"]
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p${MYSQL_ROOT_PASSWORD} --silent || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
