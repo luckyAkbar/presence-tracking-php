@@ -31,4 +31,5 @@ App\Config\Config::init([
     'auth0_cookie_secret' => getenv('AUTH0_COOKIE_SECRET') ?: '',
     'auth0_redirect_uri' => getenv('APP_BASE_URL') . getenv('AUTH0_REDIRECT_URI') ?: '',
     'auth0_logout_redirect_uri' => getenv('APP_BASE_URL') . getenv('AUTH0_LOGOUT_REDIRECT_URI') ?: '',
+    'auth0_login_success_redirect_uri' => getenv('APP_BASE_URL') . getenv('AUTH0_LOGIN_SUCCESS_REDIRECT_URI') ?: '',
 ]);

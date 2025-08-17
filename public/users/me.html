@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Simple Presence Tracking</title>
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <h1>My Profile</h1>
+            <nav class="breadcrumb">
+                <a href="/">Home</a> / <span>Profile</span>
+            </nav>
+        </header>
+
+        <main>
+            <div class="profile-container">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <img id="user-avatar" src="/images/default-avatar.png" alt="User Avatar" onerror="this.src='/images/default-avatar.png'">
+                        </div>
+                        <div class="profile-info">
+                            <h2 id="user-name">Loading...</h2>
+                            <p id="user-email" class="user-email">Loading...</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-details">
+                        <h3>Account Information</h3>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <label>User ID:</label>
+                                <span id="user-id">Loading...</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Email Verified:</label>
+                                <span id="email-verified">Loading...</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Last Updated:</label>
+                                <span id="updated-at">Loading...</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Created:</label>
+                                <span id="created-at">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-actions">
+                        <h3>Quick Actions</h3>
+                        <div class="action-buttons">
+                            <a href="/" class="btn btn-secondary">Back to Home</a>
+                            <a href="/logout" class="btn btn-danger">Sign Out</a>
+                        </div>
+                    </div>
+
+                    <div class="profile-debug" id="debug-section" style="display: none;">
+                        <h3>Debug Information</h3>
+                        <details>
+                            <summary>Raw User Data</summary>
+                            <pre id="raw-user-data"></pre>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/user-profile.js"></script>
+</body>
+</html>

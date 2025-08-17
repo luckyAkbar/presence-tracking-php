@@ -19,16 +19,20 @@ if (session_status() === PHP_SESSION_NONE) {
 // Basic router mapping
 $router = new Router();
 
-$router->get('/api/ping', function () {
-    $dbOk = App\Support\Db::ping();
-    $status = $dbOk ? 'ok' : 'degraded';
-    header('Content-Type: application/json');
-    echo json_encode([
-        'service' => 'presence-tracking',
-        'status' => $status,
-        'db' => $dbOk ? 'ok' : 'fail',
-        'time' => gmdate('c'),
-    ]);
+// Frontend page routes
+$router->get('/', function () {
+    header('Content-Type: text/html');
+    readfile(__DIR__ . '/index.html');
+});
+
+$router->get('/logout-success', function () {
+    header('Content-Type: text/html');
+    readfile(__DIR__ . '/logout-success.html');
+});
+
+$router->get('/users/me', function () {
+    header('Content-Type: text/html');
+    readfile(__DIR__ . '/users/me.html');
 });
 
 // Auth0 routes
@@ -53,8 +57,8 @@ $router->get('/callback', function () {
     }
 
     try {
-        App\Auth\AuthService::auth()->exchange(code: $_GET['code'], state: $_GET['state']);
-        header('Location: /api/me');
+        App\Auth\AuthService::auth()->exchange();
+        header('Location: ' . Config::getString('auth0_login_success_redirect_uri'));
     } catch (\Throwable $e) {
         http_response_code(400);
         header('Content-Type: application/json');
@@ -68,6 +72,18 @@ $router->get('/callback', function () {
 $router->get('/logout', function () {
     header("Location: " . App\Auth\AuthService::auth()->logout(Config::getString('auth0_logout_redirect_uri')));
     exit;
+});
+
+$router->get('/api/ping', function () {
+    $dbOk = App\Support\Db::ping();
+    $status = $dbOk ? 'ok' : 'degraded';
+    header('Content-Type: application/json');
+    echo json_encode([
+        'service' => 'presence-tracking',
+        'status' => $status,
+        'db' => $dbOk ? 'ok' : 'fail',
+        'time' => gmdate('c'),
+    ]);
 });
 
 $router->get('/api/me', function () {

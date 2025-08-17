@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Presence Tracking</title>
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+    <div class="container">
+        <header class="hero">
+            <h1>Simple Presence Tracking</h1>
+            <p class="subtitle">A lightweight attendance tracker for organizations with roles, invitations, and real-time views</p>
+        </header>
+
+        <main>
+            <section class="features">
+                <h2>Key Features</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>📊 Attendance Management</h3>
+                        <p>Track attendance for meetings and events with minimal setup</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>👥 Role-Based Access</h3>
+                        <p>Organization Admins, Members, and Guest access levels</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📧 Invitation System</h3>
+                        <p>Send and manage invitations to join your organization</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>⏰ Real-Time Updates</h3>
+                        <p>Live attendance tracking and status updates</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="user-roles">
+                <h2>User Roles</h2>
+                <div class="role-grid">
+                    <div class="role-card">
+                        <h3>Organization Admin</h3>
+                        <p>Create organizations, manage members, and configure attendance lists</p>
+                    </div>
+                    <div class="role-card">
+                        <h3>Organization Member</h3>
+                        <p>Submit attendance, view results, and manage your records</p>
+                    </div>
+                    <div class="role-card">
+                        <h3>Guest</h3>
+                        <p>Submit attendance on publicly accessible lists</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="attendance-statuses">
+                <h2>Attendance Statuses</h2>
+                <div class="status-grid">
+                    <div class="status-item present">
+                        <span class="status-badge">Present</span>
+                        <p>Checked in for the event within the allowed window</p>
+                    </div>
+                    <div class="status-item late">
+                        <span class="status-badge">Late</span>
+                        <p>Checked in after the configured start time but within the allowed window</p>
+                    </div>
+                    <div class="status-item excused">
+                        <span class="status-badge">Excused</span>
+                        <p>Did not attend but provided an accepted reason</p>
+                    </div>
+                    <div class="status-item absent">
+                        <span class="status-badge">Absent</span>
+                        <p>Did not check in and provided no acceptable reason</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="cta">
+                <h2>Get Started</h2>
+                <p>Join thousands of organizations already using Simple Presence Tracking</p>
+                <div class="button-group">
+                    <a href="/login" class="btn btn-primary">Sign In</a>
+                    <a href="/users/me" class="btn btn-secondary">View Profile</a>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Simple Presence Tracking. Built with modern web technologies.</p>
+        </footer>
+    </div>
+
+    <script src="/js/front-page.js"></script>
+</body>
+</html>
