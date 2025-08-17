@@ -7,7 +7,9 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libfreetype6-dev \
     libxml2-dev \
-    libonig-dev
+    libonig-dev \
+    git \
+    unzip
 
 # Configure and install extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -24,6 +26,9 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 
 # Clean up
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install Composer (from official image)
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Security-focused PHP-FPM setting: restrict to only handle .php
 RUN set -eux; \

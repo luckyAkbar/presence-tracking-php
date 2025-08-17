@@ -17,15 +17,18 @@ services:
   php:
     build:
       context: ./docker/php
+    working_dir: /var/www/html
     environment:
       DB_HOST: mysql
       DB_PORT: 3306
       DB_NAME: presence
       DB_USER: presence
       DB_PASSWORD: presence_pass
+      COMPOSER_HOME: /tmp/composer
+      COMPOSER_CACHE_DIR: /tmp/composer/cache
+      COMPOSER_ALLOW_SUPERUSER: "1"
     volumes:
-      - ./public:/var/www/html/public:ro
-      - ./src:/var/www/html/src:ro
+      - ./:/var/www/html
     read_only: true
     tmpfs:
       - /tmp
