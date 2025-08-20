@@ -128,3 +128,24 @@ Expected output:
 - Only `public/` is exposed by the proxy. `src/` is not web-accessible.
 - Nginx blocks dotfiles and common sensitive extensions.
 - PHP config uses `open_basedir` to restrict filesystem access to `public/`, `src/`, and `/tmp`.
+
+## Development Tools
+
+### Phinx Migrator
+
+This project use [php phinx](https://github.com/cakephp/phinx) to handle migrations. You can run `phix` through docker compose like below
+<pre>docker compose exec --user $(id -u):$(id -g) php php -d open_basedir= vendor/bin/phinx migrate -e development --dry-run</pre>
+
+
+### Composer
+
+Composer are already installed within Docker image ready to use for development. One way to run composer to install dependency is like below
+
+<pre>docker compose exec --user $(id -u):$(id -g) php php -d open_basedir= /usr/bin/composer require robmorgan/phinx</pre>
+
+
+### Mysql Database Console
+
+To connect to the application main database server, you can use `docker exec` to interactively connect to the database, for example:
+
+`docker compose exec -it mysql mysql -u username db_name -p`
