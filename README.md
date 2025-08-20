@@ -83,6 +83,8 @@ This section contains initial user stories for the early development phase. In t
 | US21 | Guest | As a Guest, I want to submit attendance on publicly accessible lists. |
 | US22 | Guest | As a Guest, I want to view results of publicly accessible attendance lists. |
 | US23 | Guest or Registered User | As a Guest or Registered User, I want to view an attendance list in real time to see records update live. |
+| USxx | Organization Member | As an organization member, I want to get list off all oncoming, in progress, finished attendance list where I have to / able to fill. |
+| USxx | Organization Admin | As an organization admin, I want to cancel an attendance list that have not been started yet so that presence list can't be filled and won't be used by the expected attendees. |
 
 #### Reporting & Export
 
