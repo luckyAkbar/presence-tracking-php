@@ -34,4 +34,15 @@ final class UserService
 
         return $createdUser;
     }
+    
+    /**
+     * Find a user by their email address (using encrypted lookup)
+     *
+     * @param string $email The email address to search for
+     * @return User|null
+     */
+    public function findByEmail(string $email): ?User
+    {
+        return $this->userRepository->findByEmail($email);
+    }
 }

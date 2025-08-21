@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace App\Container;
 
+use App\Config\Config;
 use App\Http\Controllers\Auth0Controller;
+use App\Security\EmailEncryption;
 use App\Support\Db;
 use App\User\UserRepository;
 use App\User\UserService;
@@ -20,9 +22,21 @@ final class ServiceProvider
             return new Db();
         });
 
+        // Security
+        $container->bind(EmailEncryption::class, function(Container $container) {
+            $masterKey = Config::getString('email_encryption_key');
+            if (empty($masterKey)) {
+                throw new \RuntimeException('EMAIL_ENCRYPTION_KEY environment variable is required');
+            }
+            return new EmailEncryption($masterKey);
+        });
+
         // Repositories
         $container->bind(UserRepository::class, function(Container $container) {
-            return new UserRepository($container->make(Db::class));
+            return new UserRepository(
+                $container->make(Db::class),
+                $container->make(EmailEncryption::class)
+            );
         });
 
         // Services

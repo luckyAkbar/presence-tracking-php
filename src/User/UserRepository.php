@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\User;
 
 use App\Support\Db;
+use App\Security\EmailEncryption;
 use PDO;
 
 final class UserRepository
 {
-    public function __construct(private Db $db)
-    {
+    public function __construct(
+        private Db $db,
+        private EmailEncryption $emailEncryption
+    ) {
     }
 
     /**
@@ -36,7 +39,10 @@ final class UserRepository
         return new User(
             $user['id'],
             $user['auth_id'],
-            $user['email'],
+            $this->emailEncryption->decryptEmail($user['email_encrypted'], $user['encryption_version']),
+            $user['email_hash'],
+            $user['email_encrypted'],
+            $user['encryption_version'],
             $user['email_verified'],
             $user['username'],
             $user['created_at'],
@@ -68,7 +74,10 @@ final class UserRepository
         return new User(
             $user['id'],
             $user['auth_id'],
-            $user['email'],
+            $this->emailEncryption->decryptEmail($user['email_encrypted'], $user['encryption_version']),
+            $user['email_hash'],
+            $user['email_encrypted'],
+            $user['encryption_version'],
             $user['email_verified'],
             $user['username'],
             $user['created_at'],
@@ -89,9 +98,14 @@ final class UserRepository
      */
     public function createUser(string $authId, string $email, string $username, bool $emailVerified): User
     {
+        // Process email for encryption and hashing
+        $emailData = $this->emailEncryption->processEmail($email);
+        
         $sql = 'INSERT INTO users (
             auth_id,
-            email,
+            email_hash,
+            email_encrypted,
+            encryption_version,
             email_verified,
             username,
             created_at,
@@ -99,7 +113,9 @@ final class UserRepository
             deleted_at
         ) VALUES (
             :auth_id,
-            :email,
+            :email_hash,
+            :email_encrypted,
+            :encryption_version,
             :email_verified,
             :username,
             NOW(),
@@ -111,7 +127,9 @@ final class UserRepository
         $stmt = $conn->prepare($sql);
         $stmt->execute([
             'auth_id' => $authId,
-            'email' => $email,
+            'email_hash' => $emailData['hash'],
+            'email_encrypted' => $emailData['encrypted_data'],
+            'encryption_version' => $emailData['version'],
             'email_verified' => (int) $emailVerified,
             'username' => $username,
         ]);
@@ -123,5 +141,42 @@ final class UserRepository
         }
 
         return $this->findById((int) $lastInsertId);
+    }
+    
+    /**
+     * Find a user by their email address (using encrypted lookup)
+     *
+     * @param string $email The email address to search for
+     * @return User|null
+     */
+    public function findByEmail(string $email): ?User
+    {
+        $emailHash = $this->emailEncryption->hashEmail($email);
+        
+        $sql = 'SELECT * FROM users WHERE email_hash = :email_hash AND deleted_at IS NULL LIMIT 1';
+
+        $conn = $this->db->connection();
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['email_hash' => $emailHash]);
+
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user === false) {
+            return null;
+        }
+
+        return new User(
+            $user['id'],
+            $user['auth_id'],
+            $this->emailEncryption->decryptEmail($user['email_encrypted'], $user['encryption_version']),
+            $user['email_hash'],
+            $user['email_encrypted'],
+            $user['encryption_version'],
+            $user['email_verified'],
+            $user['username'],
+            $user['created_at'],
+            $user['updated_at'],
+            $user['deleted_at'],
+        );
     }
 }

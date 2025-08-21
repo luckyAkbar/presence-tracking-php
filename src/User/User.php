@@ -15,7 +15,10 @@ final class User
     public function __construct(
         private ?int $id,
         private string $authId,
-        private string $email,
+        private string $email, // Decrypted email for business logic use
+        private string $emailHash, // Hash for database lookups
+        private string $emailEncrypted, // Encrypted email for storage
+        private int $encryptionVersion, // Encryption version for upgrades
         private int $emailVerified, // 0 or 1
         private string $username,
         string|\DateTimeImmutable|null $createdAt = null,
@@ -40,6 +43,21 @@ final class User
     public function getEmail(): string
     {
         return $this->email;
+    }
+    
+    public function getEmailHash(): string
+    {
+        return $this->emailHash;
+    }
+    
+    public function getEmailEncrypted(): string
+    {
+        return $this->emailEncrypted;
+    }
+    
+    public function getEncryptionVersion(): int
+    {
+        return $this->encryptionVersion;
     }
 
     public function isEmailVerified(): bool
