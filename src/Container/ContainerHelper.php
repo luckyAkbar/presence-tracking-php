@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace App\Container;
 
 use App\Http\Controllers\Auth0Controller;
-use App\User\UserRepositoryInterface;
-use App\User\UserServiceInterface;
 
 /**
  * Container Helper - Provides IDE-friendly container access

@@ -67,7 +67,7 @@ final class UserRepository
 
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($user === null) {
+        if ($user === false) {
             return null;
         }
 
@@ -140,7 +140,13 @@ final class UserRepository
             throw new \Exception('Failed to create user');
         }
 
-        return $this->findById((int) $lastInsertId);
+        $user = $this->findById((int) $lastInsertId);
+
+        if ($user === null) {
+            throw new \Exception('Failed to find user after creation');
+        }
+
+        return $user;
     }
     
     /**

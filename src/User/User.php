@@ -95,7 +95,7 @@ final class User
      * 
      * @param string|\DateTimeImmutable|null $value
      * @return \DateTimeImmutable|null
-     * @throws \DateInvalidFormatException if string cannot be parsed as date
+     * @throws \DateMalformedStringException  if string cannot be parsed as date
      */
     private function convertToDateTimeImmutable(string|\DateTimeImmutable|null $value): ?\DateTimeImmutable
     {
