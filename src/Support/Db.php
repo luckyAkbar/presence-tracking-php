@@ -11,7 +11,7 @@ final class Db
 {
     private static ?PDO $pdo = null;
 
-    private static function connection(): PDO
+    public static function connection(): PDO
     {
         if (self::$pdo instanceof PDO) {
             return self::$pdo;

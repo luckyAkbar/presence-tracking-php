@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Auth;
+namespace App\Auth0;
 
 use Auth0\SDK\Auth0; 
 use App\Config\Config;
 
-final class AuthService
+final class Auth0Service
 {
     private static ?Auth0 $instance = null;
 
