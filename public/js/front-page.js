@@ -90,7 +90,7 @@ async function checkAuthStatus() {
 
 // Update UI for authenticated users
 function updateUIForAuthenticatedUser() {
-    const signInBtn = document.querySelector('a[href="/login"]');
+    const signInBtn = document.querySelector('a[href="/auth0/login"]');
     if (signInBtn) {
         signInBtn.textContent = 'Dashboard';
         signInBtn.href = '/users/me';

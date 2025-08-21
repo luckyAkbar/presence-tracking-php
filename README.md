@@ -83,6 +83,8 @@ This section contains initial user stories for the early development phase. In t
 | US21 | Guest | As a Guest, I want to submit attendance on publicly accessible lists. |
 | US22 | Guest | As a Guest, I want to view results of publicly accessible attendance lists. |
 | US23 | Guest or Registered User | As a Guest or Registered User, I want to view an attendance list in real time to see records update live. |
+| USxx | Organization Member | As an organization member, I want to get list off all oncoming, in progress, finished attendance list where I have to / able to fill. |
+| USxx | Organization Admin | As an organization admin, I want to cancel an attendance list that have not been started yet so that presence list can't be filled and won't be used by the expected attendees. |
 
 #### Reporting & Export
 
@@ -128,3 +130,24 @@ Expected output:
 - Only `public/` is exposed by the proxy. `src/` is not web-accessible.
 - Nginx blocks dotfiles and common sensitive extensions.
 - PHP config uses `open_basedir` to restrict filesystem access to `public/`, `src/`, and `/tmp`.
+
+## Development Tools
+
+### Phinx Migrator
+
+This project use [php phinx](https://github.com/cakephp/phinx) to handle migrations. You can run `phix` through docker compose like below
+<pre>docker compose exec --user $(id -u):$(id -g) php php -d open_basedir= vendor/bin/phinx migrate -e development --dry-run</pre>
+
+
+### Composer
+
+Composer are already installed within Docker image ready to use for development. One way to run composer to install dependency is like below
+
+<pre>docker compose exec --user $(id -u):$(id -g) php php -d open_basedir= /usr/bin/composer require robmorgan/phinx</pre>
+
+
+### Mysql Database Console
+
+To connect to the application main database server, you can use `docker exec` to interactively connect to the database, for example:
+
+`docker compose exec -it mysql mysql -u username db_name -p`

@@ -32,4 +32,7 @@ App\Config\Config::init([
     'auth0_redirect_uri' => getenv('APP_BASE_URL') . getenv('AUTH0_REDIRECT_URI') ?: '',
     'auth0_logout_redirect_uri' => getenv('APP_BASE_URL') . getenv('AUTH0_LOGOUT_REDIRECT_URI') ?: '',
     'auth0_login_success_redirect_uri' => getenv('APP_BASE_URL') . getenv('AUTH0_LOGIN_SUCCESS_REDIRECT_URI') ?: '',
+    
+    // Email Encryption
+    'email_encryption_key' => getenv('EMAIL_ENCRYPTION_KEY') ?: '',
 ]);

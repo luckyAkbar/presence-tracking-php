@@ -2,7 +2,8 @@
     "require": {
         "symfony/http-client": "^7.3",
         "nyholm/psr7": "^1.8",
-        "auth0/auth0-php": "^8.15"
+        "auth0/auth0-php": "^8.15",
+        "robmorgan/phinx": "^0.16.10"
     },
     "config": {
         "allow-plugins": {

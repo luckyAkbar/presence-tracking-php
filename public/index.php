@@ -5,7 +5,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../src/bootstrap.php';
 
 use App\Http\Router;
-use App\Config\Config;
+use App\Container\Container;
+use App\Container\ContainerHelper;
+use App\Container\ServiceProvider;
 
 // Minimal session bootstrap for dev: ensure sessions work over HTTP and to /tmp
 if (session_status() === PHP_SESSION_NONE) {
@@ -15,6 +17,13 @@ if (session_status() === PHP_SESSION_NONE) {
     ini_set('session.save_path', '/tmp');
     session_start();
 }
+
+// Set up dependency injection container
+$container = new Container();
+ServiceProvider::register($container);
+
+// Create IDE-friendly container helper
+$app = new ContainerHelper($container);
 
 // Basic router mapping
 $router = new Router();
@@ -35,43 +44,17 @@ $router->get('/users/me', function () {
     readfile(__DIR__ . '/users/me.html');
 });
 
-// Auth0 routes
-$router->get('/login', function () {
-    App\Auth\AuthService::auth()->clear();
-
-    header("Location: " . App\Auth\AuthService::auth()->login());
-    exit;
+// Auth0 routes - Clean architecture implementation with full IDE support
+$router->get('/auth0/login', function () use ($app) {
+    $app->auth0Controller()->login();
 });
 
-$router->get('/callback', function () {
-    $hasAuthenticationFailure = isset($_GET['error']);
-    if ($hasAuthenticationFailure) {
-        echo "<h1>Authentication failed</h1>";
-        echo "<p>Error: " . $_GET['error'] . "</p>";
-    }    
-
-    $hasAuthenticated = isset($_GET['state']) && isset($_GET['code']);
-    if (!$hasAuthenticated) {
-        echo "<h1>Authentication failed</h1>";
-        echo "<p>No authentication state or code found</p>";
-    }
-
-    try {
-        App\Auth\AuthService::auth()->exchange();
-        header('Location: ' . Config::getString('auth0_login_success_redirect_uri'));
-    } catch (\Throwable $e) {
-        http_response_code(400);
-        header('Content-Type: application/json');
-        echo json_encode([
-            'error' => 'Auth callback failed',
-            'message' => $e->getMessage(),
-        ]);
-    }
+$router->get('/auth0/callback', function () use ($app) {
+    $app->auth0Controller()->callback();
 });
 
-$router->get('/logout', function () {
-    header("Location: " . App\Auth\AuthService::auth()->logout(Config::getString('auth0_logout_redirect_uri')));
-    exit;
+$router->get('/auth0/logout', function () use ($app) {
+    $app->auth0Controller()->logout();
 });
 
 $router->get('/api/ping', function () {
@@ -86,16 +69,8 @@ $router->get('/api/ping', function () {
     ]);
 });
 
-$router->get('/api/me', function () {
-    $user = App\Auth\AuthService::auth()->getUser();
-    if ($user === null) {
-        http_response_code(401);
-        header('Content-Type: application/json');
-        echo json_encode(['error' => 'Unauthorized']);
-        return;
-    }
-    header('Content-Type: application/json');
-    echo json_encode($user);
+$router->get('/api/me', function () use ($app) {
+    $app->auth0Controller()->getCurrentUser();
 });
 
 // 404 fallback
