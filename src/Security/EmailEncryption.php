@@ -182,14 +182,8 @@ final class EmailEncryption
         return strtolower(trim($email));
     }
     
-    /**
-     * Securely clear sensitive data from memory
-     */
-    public function __destruct()
-    {
-        // Sodium automatically handles secure memory clearing for keys
-        // but we can explicitly clear if needed
-        sodium_memzero($this->hashKey);
-        sodium_memzero($this->encryptKey);
-    }
+    // Note: We intentionally avoid calling sodium_memzero on readonly
+    // properties ($hashKey, $encryptKey) because PHP cannot pass
+    // readonly properties by reference for mutation. In typical PHP-FPM
+    // setups, request isolation limits exposure time of secrets.
 }
