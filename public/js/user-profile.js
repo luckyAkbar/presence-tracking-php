@@ -22,7 +22,7 @@ async function loadUserProfile() {
         if (!response.ok) {
             if (response.status === 401) {
                 // User not authenticated, redirect to login
-                window.location.href = '/login';
+                window.location.href = '/auth0/login';
                 return;
             }
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -180,7 +180,7 @@ function addEventListeners() {
     });
     
     // Add logout confirmation
-    const logoutBtn = document.querySelector('a[href="/logout"]');
+    const logoutBtn = document.querySelector('a[href="/auth0/logout"]');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', function(e) {
             if (!confirm('Are you sure you want to sign out?')) {
