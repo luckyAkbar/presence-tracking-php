@@ -7,6 +7,7 @@ namespace App\Http\Middlewares;
 use App\Http\RequestContext;
 use App\Auth0\Auth0Service;
 use App\User\UserRepository;
+use App\Http\UnauthorizedException;
 
 final class AuthenticateUser
 {
@@ -70,18 +71,12 @@ final class AuthenticateUser
         $requester = $this->auth0Service->auth()->getUser();
 
         if (!$requester || !isset($requester['email'])) {
-            header('Content-Type: application/json');
-            http_response_code(401);
-            echo json_encode(['error' => 'Unauthorized']);
-            exit;
+            throw new UnauthorizedException();
         }
 
         $user = $this->userRepository->findByEmail($requester['email']);
         if ($user === null) {
-            header('Content-Type: application/json');
-            http_response_code(401);
-            echo json_encode(['error' => 'Unauthorized']);
-            exit;
+            throw new UnauthorizedException();
         }
 
         $ctx->set('user', $user);
