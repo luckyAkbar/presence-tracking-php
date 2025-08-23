@@ -10,29 +10,26 @@ final class UserService
     ) {}
 
     /**
-     * A service that allow sign up via 3rd party providers. Each
-     * caller must ensure that the authId is unique, regardless of
-     * the provider. If the authId is already present, the user data
-     * is considered to be already present and will be returned.
+     * A service that allows sign up via 3rd party providers.
+     * The email from the auth provider (Auth0, Twitter, etc.) is used as the unique identifier.
+     * If a user with the same email already exists, their profile data is updated and returned.
      *
-     * @param string $authId
      * @param string $email
      * @param string $username
      * @param bool $emailVerified
      * 
      * @return User
      */
-    public function signUpVia3rdParty(string $authId, string $email, string $username, bool $emailVerified): User
+    public function signUpVia3rdParty(string $email, string $username, bool $emailVerified): User
     {
-        $user = $this->userRepository->findByAuthId($authId);
+        $existingUser = $this->userRepository->findByEmail($email);
 
-        if ($user !== null) {
-            return $user;
+        if ($existingUser !== null) {
+            return $existingUser;
         }
 
-        $createdUser = $this->userRepository->createUser($authId, $email, $username, $emailVerified);
-
-        return $createdUser;
+        // Create new user
+        return $this->userRepository->createUser($email, $username, $emailVerified);
     }
     
     /**

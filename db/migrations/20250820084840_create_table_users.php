@@ -20,10 +20,6 @@ final class CreateTableUsers extends AbstractMigration
     public function change(): void
     {
         $users = $this->table('users');
-        $users->addColumn('auth_id', 'string', [
-            'limit' => 255,
-            'null' => false,
-        ]);
         $users->addColumn('email_hash', 'string', [
             'limit' => 64,
             'null' => false,
@@ -60,15 +56,10 @@ final class CreateTableUsers extends AbstractMigration
             'null' => true,
             'default' => null,
         ]);
-        // Primary lookup index - auth_id is always unique
-        $users->addIndex(['auth_id'], [
-            'unique' => true,
-            'name' => 'idx_users_auth0_sub_unique',
-        ]);
         
         // Email hash lookup index - primary method for finding users by email
         $users->addIndex(['email_hash'], [
-            'unique' => false,
+            'unique' => true,
             'name' => 'idx_users_email_hash',
         ]);
         
@@ -77,6 +68,7 @@ final class CreateTableUsers extends AbstractMigration
             'unique' => false,
             'name' => 'idx_users_deleted_at',
         ]);
+        
         $users->create();
     }
 }

@@ -51,10 +51,10 @@ This section contains initial user stories for the early development phase. In t
 
 | Story Code    | User Roles     | Description      |
 | ------------- | ------------- | ------------- |
-| US2 | Guest | As a Guest, I want to sign up so I can become a Registered User. |
+| US2 ✅ | Guest | As a Guest, I want to sign up so I can become a Registered User. |
 | US3 | Registered User | As a Registered User, I want to sign in to obtain a session and access my authorized resources. |
 | US4 | Registered User | As a Registered User, I want to refresh my session without re-authenticating when eligible. |
-| US6 | Registered User | As a Registered User, I want to sign out so my current session cannot be reused. |
+| US6 ✅ | Registered User | As a Registered User, I want to sign out so my current session cannot be reused. |
 
 #### Organization & Membership
 
