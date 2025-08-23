@@ -78,7 +78,6 @@ final class Auth0Controller
             // fail safe method to ensure that the user is created in the database
             // even if the user is already present
             $this->userService->signUpVia3rdParty(
-                $user['sub'],
                 $user['email'],
                 $user['name'],
                 $user['email_verified'],

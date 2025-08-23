@@ -5,6 +5,7 @@ namespace App\User;
 
 /**
  * User Entity - Represents a user in the system
+ * Focused on business data only, auth concerns handled separately
  */
 final class User
 {
@@ -14,7 +15,6 @@ final class User
 
     public function __construct(
         private ?int $id,
-        private string $authId,
         private string $email, // Decrypted email for business logic use
         private string $emailHash, // Hash for database lookups
         private string $emailEncrypted, // Encrypted email for storage
@@ -33,11 +33,6 @@ final class User
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getAuthId(): string
-    {
-        return $this->authId;
     }
 
     public function getEmail(): string

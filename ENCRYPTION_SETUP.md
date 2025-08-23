@@ -75,7 +75,7 @@ $user = $userRepository->findByEmail('user@example.com');
 ### Creating a User
 ```php
 // Automatically encrypts email during creation
-$user = $userRepository->createUser($authId, $email, $username, $emailVerified);
+$user = $userRepository->createUser($email, $username, $emailVerified);
 ```
 
 ### Accessing Email Data
