@@ -5,10 +5,12 @@ namespace App\Container;
 
 use App\Config\Config;
 use App\Http\Controllers\Auth0Controller;
+use App\Auth0\Auth0Service;
 use App\Security\EmailEncryption;
 use App\Support\Db;
 use App\User\UserRepository;
 use App\User\UserService;
+use App\Http\Middlewares\AuthenticateUser;
 
 /**
  * Service Provider - Configures dependency injection
@@ -44,9 +46,18 @@ final class ServiceProvider
             return new UserService($container->make(UserRepository::class));
         });
 
+        $container->bind(Auth0Service::class, function(Container $container) {
+            return new Auth0Service();
+        });
+
         // Controllers
         $container->bind(Auth0Controller::class, function(Container $container) {
             return new Auth0Controller($container->make(UserService::class));
+        });
+
+        // Middlewares
+        $container->bind(AuthenticateUser::class, function(Container $container) {
+            return new AuthenticateUser($container->make(Auth0Service::class), $container->make(UserRepository::class));
         });
     }
 }
