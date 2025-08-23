@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace App\Container;
 
 use App\Http\Controllers\Auth0Controller;
+use App\Auth0\Auth0Service;
+use App\User\UserRepository;
+use App\Http\Middlewares\AuthenticateUser;
 
 /**
  * Container Helper - Provides IDE-friendly container access
@@ -21,6 +24,30 @@ final class ContainerHelper
     public function auth0Controller(): Auth0Controller
     {
         return $this->container->make(Auth0Controller::class);
+    }
+
+    /**
+     * Get Auth0Service instance
+     */
+    public function auth0Service(): Auth0Service
+    {
+        return $this->container->make(Auth0Service::class);
+    }
+
+    /**
+     * Get UserRepository instance
+     */
+    public function userRepository(): UserRepository
+    {
+        return $this->container->make(UserRepository::class);
+    }
+
+    /**
+     * Get AuthenticateUser instance
+     */
+    public function authenticateUser(): AuthenticateUser
+    {
+        return $this->container->make(AuthenticateUser::class);
     }
 
     /**

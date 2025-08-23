@@ -7,7 +7,7 @@ namespace App\User;
  * User Entity - Represents a user in the system
  * Focused on business data only, auth concerns handled separately
  */
-final class User
+final class User implements \JsonSerializable
 {
     private ?\DateTimeImmutable $createdAt;
     private ?\DateTimeImmutable $updatedAt;
@@ -104,5 +104,23 @@ final class User
 
         // Handle string input - convert to DateTimeImmutable
         return new \DateTimeImmutable($value);
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     *
+     * Exposes safe public fields only, with dates formatted as ISO-8601 strings.
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'email' => $this->email,
+            'email_verified' => $this->isEmailVerified(),
+            'username' => $this->username,
+            'created_at' => $this->createdAt?->format(DATE_ATOM),
+            'updated_at' => $this->updatedAt?->format(DATE_ATOM),
+            'deleted_at' => $this->deletedAt?->format(DATE_ATOM),
+        ];
     }
 }
