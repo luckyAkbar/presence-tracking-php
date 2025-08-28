@@ -1,4 +1,5 @@
 {
     "workbench.preferredLightColorTheme": "Default Light Modern",
-    "window.autoDetectColorScheme": true
+    "window.autoDetectColorScheme": true,
+    "workbench.preferredDarkColorTheme": "Night Owl"
 }

@@ -15,7 +15,7 @@ final class OrganizationService
 
     public function registerNewOrganization(RequestContext $ctx, string $name, string $description): Organization
     {
-        $requester = $ctx->getUser();
+        $requester = $ctx->getAuthenticatedUser();
         $requesterId = $requester->getId();
         if ($requester === null || $requesterId === null) {
             throw new UnauthorizedAccessException('This action requires an authenticated user');
