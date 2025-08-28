@@ -83,6 +83,14 @@ $router->post('/api/organizations', function () use ($app) {
     );
 });
 
+// Invitation routes
+$router->post('/api/invitations', function () use ($app) {
+    return $app->authenticateUser()->mustAuthenticate(
+        function (RequestContext $ctx) use ($app) {
+            $app->invitationController()->handleCreateInvitation($ctx);
+        }
+    );
+});
 
 // 404 fallback
 $router->fallback(function () {

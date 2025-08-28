@@ -10,6 +10,9 @@ use App\Http\Middlewares\AuthenticateUser;
 use App\Http\Controllers\OrganizationController;
 use App\Organization\OrganizationService;
 use App\Organization\OrganizationsRepository;
+use App\Http\Controllers\InvitationController;
+use App\Invitation\InvitationsService;
+use App\Invitation\InvitationsRepository;
 
 /**
  * Container Helper - Provides IDE-friendly container access
@@ -21,9 +24,7 @@ final class ContainerHelper
         private Container $container
     ) {}
 
-    /**
-     * Get AuthController instance
-     */
+    // Controllers
     public function auth0Controller(): Auth0Controller
     {
         return $this->container->make(Auth0Controller::class);
@@ -34,14 +35,31 @@ final class ContainerHelper
         return $this->container->make(OrganizationController::class);
     }
 
+    public function invitationController(): InvitationController
+    {
+        return $this->container->make(InvitationController::class);
+    }
+
+    // Services
     public function organizationService(): OrganizationService
     {
         return $this->container->make(OrganizationService::class);
     }
 
+    public function invitationService(): InvitationsService
+    {
+        return $this->container->make(InvitationsService::class);
+    }
+
+    // Repositories
     public function organizationRepository(): OrganizationsRepository
     {
         return $this->container->make(OrganizationsRepository::class);
+    }
+
+    public function invitationRepository(): InvitationsRepository
+    {
+        return $this->container->make(InvitationsRepository::class);
     }
 
     /**

@@ -14,6 +14,9 @@ use App\Http\Middlewares\AuthenticateUser;
 use App\Http\Controllers\OrganizationController;
 use App\Organization\OrganizationService;
 use App\Organization\OrganizationsRepository;
+use App\Invitation\InvitationsRepository;
+use App\Http\Controllers\InvitationController;
+use App\Invitation\InvitationsService;
 
 /**
  * Service Provider - Configures dependency injection
@@ -44,6 +47,10 @@ final class ServiceProvider
             );
         });
 
+        $container->bind(InvitationsRepository::class, function(Container $container) {
+            return new InvitationsRepository($container->make(Db::class));
+        });
+
         // Services
         $container->bind(UserService::class, function(Container $container) {
             return new UserService($container->make(UserRepository::class));
@@ -60,6 +67,10 @@ final class ServiceProvider
         $container->bind(Auth0Service::class, function(Container $container) {
             return new Auth0Service();
         });
+        
+        $container->bind(InvitationsService::class, function(Container $container) {
+            return new InvitationsService($container->make(InvitationsRepository::class), $container->make(UserRepository::class));
+        });
 
         // Controllers
         $container->bind(Auth0Controller::class, function(Container $container) {
@@ -68,6 +79,10 @@ final class ServiceProvider
 
         $container->bind(OrganizationController::class, function(Container $container) {
             return new OrganizationController($container->make(OrganizationService::class));
+        });
+
+        $container->bind(InvitationController::class, function(Container $container) {
+            return new InvitationController($container->make(InvitationsService::class));
         });
 
         // Middlewares
