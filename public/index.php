@@ -100,6 +100,14 @@ $router->get('/api/invitations/me', function () use ($app) {
     );
 });
 
+$router->get('/api/invitations/organizations', function () use ($app) {
+    return $app->authenticateUser()->mustAuthenticate(
+        function (RequestContext $ctx) use ($app) {
+            $app->invitationController()->handleSearchOrganizationMemberInvitation($ctx);
+        }
+    );
+});
+
 // 404 fallback
 $router->fallback(function () {
     http_response_code(404);

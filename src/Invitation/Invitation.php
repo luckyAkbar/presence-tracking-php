@@ -39,4 +39,32 @@ final class Invitation implements \JsonSerializable
             'deletedAt' => $this->deleted_at,
         ];
     }
+
+    public static function getAllValidStatuses(): array
+    {
+        return [
+            'pending',
+            'accepted',
+            'rejected',
+            'cancelled',
+        ];
+    }
+
+    public static function isAllValidStatus(array $statuses): bool
+    {
+        $valid_statuses = self::getAllValidStatuses();
+
+        $elemCount = count($statuses);
+        if ($elemCount <= 0 || $elemCount > count(self::getAllValidStatuses())) {
+            return false;
+        }
+
+        foreach ($statuses as $status) {
+            if (!in_array($status, $valid_statuses)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

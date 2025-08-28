@@ -88,4 +88,51 @@ final class InvitationsService
 
         return $invitations;
     }
+
+    public function searchOrganizationMemberInvitation(RequestContext $ctx, int $organization_id, array $search_params): array
+    {
+        $requester = $ctx->getAuthenticatedUser();
+        if ($requester === null || $requester->getId() === null) {
+            throw new UnauthorizedAccessException('This action requires an authenticated user');
+        }
+
+        if (!$requester->isAdminOfOrganization($organization_id)) {
+            throw new ForbiddenAccessException('Organization member invitation can only be fetched by an admin of the organization');   
+        }
+
+        $limit = $search_params['limit'] ?? 100;
+        $offset = $search_params['offset'] ?? 0;
+        $statuses = $search_params['statuses'] ?? Invitation::getAllValidStatuses();
+
+        if (!Invitation::isAllValidStatus($statuses)) {
+            $statuses = Invitation::getAllValidStatuses();
+        }
+
+        $target_email = $search_params['target_email'] ?? null;
+        $target_user_id = null;
+
+        if ($target_email !== null) {
+            $target_user_id = $this->userRepository->findByEmail($target_email);
+            if ($target_user_id === null) {
+                throw new ResourceNotFoundException('Target user with email ' . $target_email . ' not found');
+            }
+
+            $target_user_id = $target_user_id->getId();
+        }
+
+        $searchInvitationParams = [
+            'limit' => $limit,
+            'offset' => $offset,
+            'statuses' => $statuses,
+            'organization_id' => $organization_id,
+            'intended_for' => $target_user_id,
+        ];
+
+        $invitations = $this->invitationsRepository->search($searchInvitationParams);
+        if ($invitations === null) {
+            throw new ResourceNotFoundException('No invitations found');
+        }
+
+        return $invitations;
+    }
 }

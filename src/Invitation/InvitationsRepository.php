@@ -96,6 +96,67 @@ final class InvitationsRepository
         return $invitations;
     }
 
+    public function search(array $search_params): array | null
+    {
+        $where_clauses = [];
+        $where_params = [];
+
+        if (isset($search_params['organization_id'])) {
+            $where_clauses[] = 'organization_id = :organization_id';
+            $where_params['organization_id'] = $search_params['organization_id'];
+        }
+
+        if (isset($search_params['intended_for'])) {
+            $where_clauses[] = 'intended_for = :intended_for';
+            $where_params['intended_for'] = $search_params['intended_for'];
+        }
+
+        if (isset($search_params['statuses']) && is_array($search_params['statuses'])) {
+            $placeholders = [];
+            foreach (array_values($search_params['statuses']) as $idx => $status) {
+                $key = 'status_' . $idx;
+                $placeholders[] = 'LOWER(:' . $key . ')';
+                $where_params[$key] = strtolower((string) $status);
+            }
+            $where_clauses[] = 'LOWER(status) IN (' . implode(',', $placeholders) . ')';
+        }
+
+        // Add deleted_at filter
+        $where_clauses[] = 'deleted_at IS NULL';
+
+        $where_clause = implode(' AND ', $where_clauses);
+        
+        // Add pagination
+        $limit = isset($search_params['limit']) ? (int) $search_params['limit'] : 100;
+        $offset = isset($search_params['offset']) ? (int) $search_params['offset'] : 0;
+        
+        $sql = 'SELECT * FROM invitations WHERE ' . $where_clause . ' ORDER BY created_at DESC LIMIT :limit OFFSET :offset';
+        $stmt = $this->db->connection()->prepare($sql);
+        
+        // Bind all parameters including limit and offset
+        foreach ($where_params as $key => $value) {
+            $stmt->bindValue(':' . $key, $value);
+        }
+        $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        if ($result === false) {
+            return null;
+        }
+
+        $invitations = [];
+        foreach ($result as $row) {
+            $invitations[] = self::fromDbResult($row);
+        }
+
+        if (count($invitations) === 0) {
+            return null;
+        }
+
+        return $invitations;
+    }
+
     /**
      * Create an Invitation object from a database result
      * 

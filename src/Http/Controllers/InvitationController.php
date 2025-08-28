@@ -60,6 +60,53 @@ final class InvitationController
         }, $ctx);
     }
 
+    public function handleSearchOrganizationMemberInvitation(RequestContext $ctx): void
+    {
+        header('Content-Type: application/json');
+
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+
+        if ($data === null) {
+            http_response_code(400);
+            echo json_encode([
+                'error' => 'Bad request',
+                'message' => 'missing required body requests',
+            ]);
+            return;
+        }
+
+        $organization_id = $data['organization_id'];
+        $limit = $data['limit'] ?? 100;
+        $offset = $data['offset'] ?? 0;
+        $statuses = $data['statuses'] ?? null;
+        $target_email = $data['target_email'] ?? null;
+
+        if (filter_var($target_email, FILTER_VALIDATE_EMAIL) === false) {
+            http_response_code(400);
+            echo json_encode([
+                'error' => 'Bad request',
+                'message' => 'target_email must be a valid email address',
+            ]);
+            return;
+        }
+
+        $search_params = [
+            'limit' => $limit,
+            'offset' => $offset,
+            'statuses' => $statuses,
+            'target_email' => $target_email,
+        ];
+        
+
+        $this->safeExecute(function(RequestContext $ctx) use ($organization_id,$search_params) {
+            $invitations = $this->invitationService->searchOrganizationMemberInvitation($ctx, $organization_id, $search_params);
+
+            http_response_code(200);
+            echo json_encode($invitations);
+        }, $ctx);
+    }
+
     private function safeExecute(callable $handler, RequestContext $ctx): void
     {
         try {
