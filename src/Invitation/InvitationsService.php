@@ -71,4 +71,21 @@ final class InvitationsService
 
         return $invitation;
     }
+
+    public function getInvitationIntendedToUser(RequestContext $ctx): array
+    {
+        $requester = $ctx->getAuthenticatedUser();
+        $user_id = $requester->getId();
+        if ($requester === null || $user_id === null) {
+            throw new UnauthorizedAccessException('This action requires an authenticated user');
+        }
+
+        $invitations = $this->invitationsRepository->findByIntendedForId($user_id);
+        if ($invitations === null) {
+            throw new ResourceNotFoundException('Invitation not found');
+        }
+
+
+        return $invitations;
+    }
 }

@@ -47,6 +47,19 @@ final class InvitationController
         }, $ctx);
     }
 
+    public function handleGetInvitationsForRequester(RequestContext $ctx): void
+    {
+        $this->safeExecute(function(RequestContext $ctx) {
+            $invitations = $this->invitationService->getInvitationIntendedToUser($ctx);
+
+            http_response_code(200);
+            echo json_encode([
+                'invitations' => $invitations,
+                'count' => count($invitations),
+            ]);
+        }, $ctx);
+    }
+
     private function safeExecute(callable $handler, RequestContext $ctx): void
     {
         try {

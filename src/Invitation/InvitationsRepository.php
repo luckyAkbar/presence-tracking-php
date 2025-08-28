@@ -74,6 +74,28 @@ final class InvitationsRepository
         return self::fromDbResult($result);
     }
 
+    public function findByIntendedForId(int $user_id): array | null
+    {
+        $sql = 'SELECT * FROM invitations WHERE intended_for = :user_id AND deleted_at IS NULL';
+        $stmt = $this->db->connection()->prepare($sql);
+        $stmt->execute(['user_id' => $user_id]);
+        $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        if ($result === false) {
+            return null;
+        }
+
+        $invitations = [];
+        foreach ($result as $row) {
+            $invitations[] = self::fromDbResult($row);
+        }
+
+        if (count($invitations) === 0) {
+            return null;
+        }
+
+        return $invitations;
+    }
+
     /**
      * Create an Invitation object from a database result
      * 
