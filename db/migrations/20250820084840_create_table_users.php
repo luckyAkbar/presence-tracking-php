@@ -19,7 +19,15 @@ final class CreateTableUsers extends AbstractMigration
      */
     public function change(): void
     {
-        $users = $this->table('users');
+        $users = $this->table('users', [
+            'id' => false,
+            'primary_key' => ['id'],
+        ]);
+        $users->addColumn('id', 'biginteger', [
+            'identity' => true,
+            'null' => false,
+            'signed' => false,
+        ]);
         $users->addColumn('email_hash', 'string', [
             'limit' => 64,
             'null' => false,
@@ -68,7 +76,7 @@ final class CreateTableUsers extends AbstractMigration
             'unique' => false,
             'name' => 'idx_users_deleted_at',
         ]);
-        
+
         $users->create();
     }
 }
