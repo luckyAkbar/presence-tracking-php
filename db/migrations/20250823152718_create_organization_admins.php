@@ -45,14 +45,12 @@ final class CreateOrganizationAdmins extends AbstractMigration
             'null' => true,
         ]);
 
-        $organizationAdmins->addIndex('organization_id', [
-            'unique' => false,
-            'name' => 'idx_organization_admins_organization_id',
+        // to ensure that a user can only be an admin of an organization once
+        $organizationAdmins->addIndex(['organization_id', 'user_id'], [
+            'unique' => true,
+            'name' => 'unique_organization_admin',
         ]);
-        $organizationAdmins->addIndex('user_id', [
-            'unique' => false,
-            'name' => 'idx_organization_admins_user_id',
-        ]);
+
         $organizationAdmins->addIndex(['deleted_at'], [
             'unique' => false,
             'name' => 'idx_organization_admins_deleted_at',
