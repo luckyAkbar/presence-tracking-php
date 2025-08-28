@@ -7,6 +7,9 @@ use App\Http\Controllers\Auth0Controller;
 use App\Auth0\Auth0Service;
 use App\User\UserRepository;
 use App\Http\Middlewares\AuthenticateUser;
+use App\Http\Controllers\OrganizationController;
+use App\Organization\OrganizationService;
+use App\Organization\OrganizationsRepository;
 
 /**
  * Container Helper - Provides IDE-friendly container access
@@ -24,6 +27,21 @@ final class ContainerHelper
     public function auth0Controller(): Auth0Controller
     {
         return $this->container->make(Auth0Controller::class);
+    }
+
+    public function organizationController(): OrganizationController
+    {
+        return $this->container->make(OrganizationController::class);
+    }
+
+    public function organizationService(): OrganizationService
+    {
+        return $this->container->make(OrganizationService::class);
+    }
+
+    public function organizationRepository(): OrganizationsRepository
+    {
+        return $this->container->make(OrganizationsRepository::class);
     }
 
     /**
