@@ -53,7 +53,7 @@ final class AuthenticateUser
             return $this->invokeNext($next, $ctx);
         }
 
-        $ctx->set('user', $user);
+        $ctx->setUser($user);
         return $this->invokeNext($next, $ctx);
     }
 
@@ -69,17 +69,31 @@ final class AuthenticateUser
         $ctx = new RequestContext();
 
         $requester = $this->auth0Service->auth()->getUser();
-
+        
         if (!$requester || !isset($requester['email'])) {
-            throw new UnauthorizedException();
+            http_response_code(401);
+            header('Content-Type: application/json');
+
+            echo  json_encode([
+                'error' => 'Unauthorized',
+                'message' => 'missing user credentials',
+            ]);
+            return;
         }
 
         $user = $this->userRepository->findByEmail($requester['email']);
         if ($user === null) {
-            throw new UnauthorizedException();
+            http_response_code(401);
+            header('Content-Type: application/json');
+
+            echo json_encode([
+                'error' => 'Unauthorized',
+                'message' => 'User not found',
+            ]);
+            return;
         }
 
-        $ctx->set('user', $user);
+        $ctx->setUser($user);
         return $this->invokeNext($next, $ctx);
     }
 }

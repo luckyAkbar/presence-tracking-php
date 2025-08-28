@@ -7,12 +7,19 @@ final class Router
 {
     /** @var array<string, callable> */
     private array $getRoutes = [];
+    /** @var array<string, callable> */
+    private array $postRoutes = [];
     /** @var callable|null */
     private $fallbackHandler = null;
 
     public function get(string $path, callable $handler): void
     {
         $this->getRoutes[$path] = $handler;
+    }
+
+    public function post(string $path, callable $handler): void
+    {
+        $this->postRoutes[$path] = $handler;
     }
 
     public function fallback(callable $handler): void
@@ -30,6 +37,11 @@ final class Router
 
         if ($method === 'GET' && isset($this->getRoutes[$uri])) {
             ($this->getRoutes[$uri])();
+            return;
+        }
+
+        if ($method === 'POST' && isset($this->postRoutes[$uri])) {
+            ($this->postRoutes[$uri])();
             return;
         }
 

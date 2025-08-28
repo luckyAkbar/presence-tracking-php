@@ -52,7 +52,7 @@ This section contains initial user stories for the early development phase. In t
 | Story Code    | User Roles     | Description      |
 | ------------- | ------------- | ------------- |
 | US2 ✅ | Guest | As a Guest, I want to sign up so I can become a Registered User. |
-| US3 | Registered User | As a Registered User, I want to sign in to obtain a session and access my authorized resources. |
+| US3 ✅ | Registered User | As a Registered User, I want to sign in to obtain a session and access my authorized resources. |
 | US4 | Registered User | As a Registered User, I want to refresh my session without re-authenticating when eligible. |
 | US6 ✅ | Registered User | As a Registered User, I want to sign out so my current session cannot be reused. |
 
@@ -60,7 +60,7 @@ This section contains initial user stories for the early development phase. In t
 
 | Story Code    | User Roles     | Description      |
 | ------------- | ------------- | ------------- |
-| US5 | Registered User | As a Registered User, I want to register an Organization and become its Organization Admin. |
+| US5 ✅ | Registered User | As a Registered User, I want to register an Organization and become its Organization Admin. |
 | US7 | Organization Admin | As an Organization Admin, I want to invite Registered Users to join my Organization as Members and track invitation status (pending/accepted/rejected). |
 | US8 | Organization Admin | As an Organization Admin, I want to cancel pending membership invitations I sent so invitees can no longer view or accept them. |
 | US9 | Organization Admin | As an Organization Admin, I want to remove Members from my Organization to revoke their access. |

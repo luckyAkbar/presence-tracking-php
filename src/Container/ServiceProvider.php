@@ -11,6 +11,9 @@ use App\Support\Db;
 use App\User\UserRepository;
 use App\User\UserService;
 use App\Http\Middlewares\AuthenticateUser;
+use App\Http\Controllers\OrganizationController;
+use App\Organization\OrganizationService;
+use App\Organization\OrganizationsRepository;
 
 /**
  * Service Provider - Configures dependency injection
@@ -46,6 +49,14 @@ final class ServiceProvider
             return new UserService($container->make(UserRepository::class));
         });
 
+        $container->bind(OrganizationService::class, function(Container $container) {
+            return new OrganizationService($container->make(OrganizationsRepository::class));
+        });
+
+        $container->bind(OrganizationsRepository::class, function(Container $container) {
+            return new OrganizationsRepository($container->make(Db::class));
+        });
+
         $container->bind(Auth0Service::class, function(Container $container) {
             return new Auth0Service();
         });
@@ -53,6 +64,10 @@ final class ServiceProvider
         // Controllers
         $container->bind(Auth0Controller::class, function(Container $container) {
             return new Auth0Controller($container->make(UserService::class));
+        });
+
+        $container->bind(OrganizationController::class, function(Container $container) {
+            return new OrganizationController($container->make(OrganizationService::class));
         });
 
         // Middlewares
