@@ -53,7 +53,7 @@ final class AuthenticateUser
             return $this->invokeNext($next, $ctx);
         }
 
-        $ctx->set('user', $user);
+        $ctx->setUser($user);
         return $this->invokeNext($next, $ctx);
     }
 
@@ -79,7 +79,7 @@ final class AuthenticateUser
             throw new UnauthorizedException();
         }
 
-        $ctx->set('user', $user);
+        $ctx->setUser($user);
         return $this->invokeNext($next, $ctx);
     }
 }
