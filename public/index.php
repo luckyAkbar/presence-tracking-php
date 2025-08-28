@@ -8,6 +8,7 @@ use App\Http\Router;
 use App\Container\Container;
 use App\Container\ContainerHelper;
 use App\Container\ServiceProvider;
+use App\Http\RequestContext;
 
 // Minimal session bootstrap for dev: ensure sessions work over HTTP and to /tmp
 if (session_status() === PHP_SESSION_NONE) {
@@ -72,6 +73,16 @@ $router->get('/api/ping', function () {
 $router->get('/api/me', function () use ($app) {
     $app->auth0Controller()->getCurrentUser();
 });
+
+// Organization routes
+$router->post('/api/organizations', function () use ($app) {
+    return $app->authenticateUser()->mustAuthenticate(
+        function (RequestContext $ctx) use ($app) {
+            $app->organizationController()->registerNewOrganization($ctx);
+        }
+    );
+});
+
 
 // 404 fallback
 $router->fallback(function () {
