@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\User;
 
+use App\Support\Helper;
+
 /**
  * User Entity - Represents a user in the system
  * Focused on business data only, auth concerns handled separately
@@ -25,9 +27,9 @@ final class User implements \JsonSerializable
         string|\DateTimeImmutable|null $updatedAt = null,
         string|\DateTimeImmutable|null $deletedAt = null
     ) {
-        $this->createdAt = $this->convertToDateTimeImmutable($createdAt);
-        $this->updatedAt = $this->convertToDateTimeImmutable($updatedAt);
-        $this->deletedAt = $this->convertToDateTimeImmutable($deletedAt);
+        $this->createdAt = Helper::convertToDateTimeImmutable($createdAt);
+        $this->updatedAt = Helper::convertToDateTimeImmutable($updatedAt);
+        $this->deletedAt = Helper::convertToDateTimeImmutable($deletedAt);
     }
 
     public function getId(): ?int
@@ -83,27 +85,6 @@ final class User implements \JsonSerializable
     public function isDeleted(): bool
     {
         return $this->deletedAt !== null;
-    }
-
-    /**
-     * Convert string or DateTimeImmutable to DateTimeImmutable
-     * 
-     * @param string|\DateTimeImmutable|null $value
-     * @return \DateTimeImmutable|null
-     * @throws \DateMalformedStringException  if string cannot be parsed as date
-     */
-    private function convertToDateTimeImmutable(string|\DateTimeImmutable|null $value): ?\DateTimeImmutable
-    {
-        if ($value === null) {
-            return null;
-        }
-
-        if ($value instanceof \DateTimeImmutable) {
-            return $value;
-        }
-
-        // Handle string input - convert to DateTimeImmutable
-        return new \DateTimeImmutable($value);
     }
 
     /**
