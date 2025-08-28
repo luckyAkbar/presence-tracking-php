@@ -144,4 +144,56 @@ final class UserRepository
             $user['deleted_at'],
         );
     }
+
+    /**
+     * Get list of organization ids where the user is a member of
+     * 
+     * @param int $user_id
+     * @return array<int>|null list of organization ids where the user is a member of
+     */
+    public function getUserOrganizationsMembership(int $user_id): array|null
+    {
+        $sql = 'SELECT
+            organization_id
+            FROM organization_members
+            WHERE user_id = :user_id;
+        ';
+
+        $conn = $this->db->connection();
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['user_id' => $user_id]);
+
+        $result = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        if ($result === false) {
+            return null;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get list of organization ids where the user is an admin of
+     * 
+     * @param int $user_id
+     * @return array<int>|null list of organization ids where the user is an admin of
+     */
+    public function getUserOrganizationsAdministrative(int $user_id): array|null
+    {
+        $sql = 'SELECT
+            organization_id
+            FROM organization_admins
+            WHERE user_id = :user_id;
+        ';
+
+        $conn = $this->db->connection();
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['user_id' => $user_id]);
+
+        $result = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        if ($result === false) {
+            return null;
+        }
+
+        return $result;
+    }
 }
