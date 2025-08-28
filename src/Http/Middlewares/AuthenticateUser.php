@@ -7,7 +7,7 @@ namespace App\Http\Middlewares;
 use App\Http\RequestContext;
 use App\Auth0\Auth0Service;
 use App\User\UserRepository;
-use App\Http\UnauthorizedException;
+use App\Http\AuthenticatedUser;
 
 final class AuthenticateUser
 {
@@ -29,32 +29,6 @@ final class AuthenticateUser
             return $next($ctx);
         }
         return $next();
-    }
-
-    /**
-     * Run the middleware. If the user is not authenticated,
-     * the request context will be set to empty and call the next handler.
-     * 
-     * @param callable $next
-     * @return mixed
-     */
-    public function run(callable $next)
-    {
-        $ctx = new RequestContext();
-
-        $requester = $this->auth0Service->auth()->getUser();
-
-        if (!$requester || !isset($requester['email'])) {
-            return $this->invokeNext($next, $ctx);
-        }
-
-        $user = $this->userRepository->findByEmail($requester['email']);
-        if ($user === null) {
-            return $this->invokeNext($next, $ctx);
-        }
-
-        $ctx->setUser($user);
-        return $this->invokeNext($next, $ctx);
     }
 
     /**
@@ -92,8 +66,21 @@ final class AuthenticateUser
             ]);
             return;
         }
+        
+        $user_id = $user->getId();
+        $authenticatedUser = new AuthenticatedUser($user_id);
 
-        $ctx->setUser($user);
+        $organizationIds = $this->userRepository->getUserOrganizationsMembership($user_id);
+        if ($organizationIds !== null) {
+            $authenticatedUser->setMemberOfOrganizations($organizationIds);
+        }
+
+        $adminOrganizationIds = $this->userRepository->getUserOrganizationsAdministrative($user_id);
+        if ($adminOrganizationIds !== null) {
+            $authenticatedUser->setAdminOfOrganizations($adminOrganizationIds);
+        }
+
+        $ctx->setAuthenticatedUser($authenticatedUser);
         return $this->invokeNext($next, $ctx);
     }
 }

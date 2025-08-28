@@ -20,14 +20,14 @@ final class RequestContext
         return $this->data[$key] ?? null;
     }
 
-    public function setUser(User $user): void
+    public function setAuthenticatedUser(AuthenticatedUser $authenticatedUser): void
     {
-        $this->set('user', $user);
+        $this->set('authenticated_user', $authenticatedUser);
     }
 
-    public function getUser(): ?User
+    public function getAuthenticatedUser(): ?AuthenticatedUser
     {
-        return $this->get('user');
+        return $this->get('authenticated_user');
     }
 
     public function clear(): void
