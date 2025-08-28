@@ -43,6 +43,26 @@ final class Db
             return false;
         }
     }
+
+    public static function transaction(callable $callback)
+    {
+        $pdo = self::connection();
+        
+        try {
+            $pdo->beginTransaction();
+            $result = $callback($pdo);
+            $pdo->commit();
+            return $result;
+        } catch (\Throwable $e) {
+            $pdo->rollBack();
+            throw $e;
+        }
+    }
+
+    public static function lastInsertId(): string
+    {
+        return self::connection()->lastInsertId();
+    }
 }
 
 
