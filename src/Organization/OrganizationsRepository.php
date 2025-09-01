@@ -13,7 +13,7 @@ final class OrganizationsRepository
         private Db $db,
     ) {}
 
-    private function _create(PDO $conn, string $name, string $description, int $createdBy): int
+    public function create(string $name, string $description, int $createdBy, PDO|null $pdo): Organization|null
     {
         $sql = 'INSERT INTO organizations (
             name,
@@ -33,6 +33,7 @@ final class OrganizationsRepository
             NULL
         )';
         
+        $conn = $this->safeCreateConnection($pdo);
         $stmt = $conn->prepare($sql);
         $stmt->execute([
             'name' => $name,
@@ -46,10 +47,10 @@ final class OrganizationsRepository
             throw new \Exception('Failed to create organization');
         }
 
-        return (int) $lastInsertId;
+        return $this->findById((int)$lastInsertId, $conn);
     }
 
-    private function _createOrganizationAdmin(PDO $conn, int $organizationId, int $userId): int
+    public function createOrganizationAdmin(int $organizationId, int $userId, PDO|null $pdo): int
     {
         $sql = 'INSERT INTO organization_admins (
             organization_id,
@@ -65,6 +66,7 @@ final class OrganizationsRepository
             NULL
         )';
 
+        $conn = $this->safeCreateConnection($pdo);
         $stmt = $conn->prepare($sql);
         $stmt->execute([
             'organization_id' => $organizationId,
@@ -80,22 +82,11 @@ final class OrganizationsRepository
         return (int) $lastInsertId;
     }
 
-    public function create(string $name, string $description, int $createdBy): Organization
-    {
-        $result = $this->db->transaction(function (PDO $conn) use ($name, $description, $createdBy) {
-            $organizationId = $this->_create($conn, $name, $description, $createdBy);
-            $this->_createOrganizationAdmin($conn, $organizationId, $createdBy);
-            
-            return $this->findById($organizationId);
-        });
-
-        return $result;
-    }
-
-    public function findById(int $id): ?Organization
+    public function findById(int $id, PDO|null $pdo): ?Organization
     {
         $sql = 'SELECT * FROM organizations WHERE id = :id AND deleted_at IS NULL LIMIT 1';
-        $stmt = $this->db->connection()->prepare($sql);
+        $conn = $this->safeCreateConnection($pdo);
+        $stmt = $conn->prepare($sql);
         $stmt->execute(['id' => $id]);
         
         $result = $stmt->fetch();
@@ -104,6 +95,15 @@ final class OrganizationsRepository
         }
 
         return self::fromDbResult($result);
+    }
+
+    public function safeCreateConnection(PDO|null $pdo): \PDO
+    {
+        if ($pdo === null) {
+            return $this->db->connection();
+        }
+
+        return $pdo;
     }
 
     public static function fromDbResult(array $result): Organization

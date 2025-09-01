@@ -63,7 +63,11 @@ final class ServiceProvider
         });
 
         $container->bind(OrganizationService::class, function(Container $container) {
-            return new OrganizationService($container->make(OrganizationsRepository::class));
+            return new OrganizationService(
+                $container->make(OrganizationsRepository::class),
+                $container->make(OrganizationMemberRepository::class),
+                $container->make(Transaction::class)
+            );
         });
 
         $container->bind(OrganizationsRepository::class, function(Container $container) {
