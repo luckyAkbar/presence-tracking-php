@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth0Controller;
 use App\Auth0\Auth0Service;
 use App\Security\EmailEncryption;
 use App\Support\Db;
+use App\Support\Transaction;
 use App\User\UserRepository;
 use App\User\UserService;
 use App\Http\Middlewares\AuthenticateUser;
@@ -17,6 +18,8 @@ use App\Organization\OrganizationsRepository;
 use App\Invitation\InvitationsRepository;
 use App\Http\Controllers\InvitationController;
 use App\Invitation\InvitationsService;
+use App\Organization\OrganizationMemberRepository;
+use App\Invitation\InvitationQueryService;
 
 /**
  * Service Provider - Configures dependency injection
@@ -51,13 +54,21 @@ final class ServiceProvider
             return new InvitationsRepository($container->make(Db::class));
         });
 
+        $container->bind(OrganizationMemberRepository::class, function(Container $container) {
+            return new OrganizationMemberRepository($container->make(Db::class));
+        });
+
         // Services
         $container->bind(UserService::class, function(Container $container) {
             return new UserService($container->make(UserRepository::class));
         });
 
         $container->bind(OrganizationService::class, function(Container $container) {
-            return new OrganizationService($container->make(OrganizationsRepository::class));
+            return new OrganizationService(
+                $container->make(OrganizationsRepository::class),
+                $container->make(OrganizationMemberRepository::class),
+                $container->make(Transaction::class)
+            );
         });
 
         $container->bind(OrganizationsRepository::class, function(Container $container) {
@@ -69,7 +80,13 @@ final class ServiceProvider
         });
         
         $container->bind(InvitationsService::class, function(Container $container) {
-            return new InvitationsService($container->make(InvitationsRepository::class), $container->make(UserRepository::class));
+            return new InvitationsService(
+                $container->make(InvitationsRepository::class),
+                $container->make(UserRepository::class),
+                $container->make(OrganizationMemberRepository::class),
+                $container->make(InvitationQueryService::class),
+                $container->make(Transaction::class)
+            );
         });
 
         // Controllers
@@ -88,6 +105,16 @@ final class ServiceProvider
         // Middlewares
         $container->bind(AuthenticateUser::class, function(Container $container) {
             return new AuthenticateUser($container->make(Auth0Service::class), $container->make(UserRepository::class));
+        });
+
+        // Transaction
+        $container->bind(Transaction::class, function(Container $container) {
+            return new Transaction($container->make(Db::class));
+        });
+
+        // Query Services
+        $container->bind(InvitationQueryService::class, function(Container $container) {
+            return new InvitationQueryService($container->make(Db::class), $container->make(EmailEncryption::class));
         });
     }
 }

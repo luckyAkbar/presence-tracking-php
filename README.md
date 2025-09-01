@@ -61,11 +61,11 @@ This section contains initial user stories for the early development phase. In t
 | Story Code    | User Roles     | Description      |
 | ------------- | ------------- | ------------- |
 | US5 ✅ | Registered User | As a Registered User, I want to register an Organization and become its Organization Admin. |
-| US7 | Organization Admin | As an Organization Admin, I want to invite Registered Users to join my Organization as Members and track invitation status (pending/accepted/rejected). |
-| US8 | Organization Admin | As an Organization Admin, I want to cancel pending membership invitations I sent so invitees can no longer view or accept them. |
+| US7 ✅ | Organization Admin | As an Organization Admin, I want to invite Registered Users to join my Organization as Members and track invitation status (pending/accepted/rejected). |
+| US8 ✅ | Organization Admin | As an Organization Admin, I want to cancel pending membership invitations I sent so invitees can no longer view or accept them. |
 | US9 | Organization Admin | As an Organization Admin, I want to remove Members from my Organization to revoke their access. |
-| US10 | Registered User | As a Registered User, I want to view invitations to join Organizations. |
-| US11 | Registered User | As a Registered User, I want to accept or reject Organization membership invitations and notify the inviter. |
+| US10 ✅ | Registered User | As a Registered User, I want to view invitations to join Organizations. |
+| US11 ✅ | Registered User | As a Registered User, I want to accept or reject Organization membership invitations and notify the inviter. |
 | US12 | Registered User | As a Registered User, I want to leave an Organization I’m a member of and notify the Organization Admin. |
 
 #### Attendance Lists

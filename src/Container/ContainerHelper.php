@@ -13,6 +13,9 @@ use App\Organization\OrganizationsRepository;
 use App\Http\Controllers\InvitationController;
 use App\Invitation\InvitationsService;
 use App\Invitation\InvitationsRepository;
+use App\Support\Transaction;
+use App\Organization\OrganizationMemberRepository;
+use App\Invitation\InvitationQueryService;
 
 /**
  * Container Helper - Provides IDE-friendly container access
@@ -60,6 +63,23 @@ final class ContainerHelper
     public function invitationRepository(): InvitationsRepository
     {
         return $this->container->make(InvitationsRepository::class);
+    }
+
+    public function organizationMemberRepository(): OrganizationMemberRepository
+    {
+        return $this->container->make(OrganizationMemberRepository::class);
+    }
+
+    // Transaction
+    public function transaction(): Transaction
+    {
+        return $this->container->make(Transaction::class);
+    }
+
+    // Query Services
+    public function invitationQueryService(): InvitationQueryService
+    {
+        return $this->container->make(InvitationQueryService::class);
     }
 
     /**

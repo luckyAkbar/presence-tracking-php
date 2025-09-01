@@ -9,6 +9,12 @@ final class Router
     private array $getRoutes = [];
     /** @var array<string, callable> */
     private array $postRoutes = [];
+    /** @var array<string, callable> */
+    private array $patchRoutes = [];
+    /** @var array<string, callable> */
+    private array $putRoutes = [];
+    /** @var array<string, callable> */
+    private array $deleteRoutes = [];
     /** @var callable|null */
     private $fallbackHandler = null;
 
@@ -20,6 +26,21 @@ final class Router
     public function post(string $path, callable $handler): void
     {
         $this->postRoutes[$path] = $handler;
+    }
+
+    public function patch(string $path, callable $handler): void
+    {
+        $this->patchRoutes[$path] = $handler;
+    }
+
+    public function put(string $path, callable $handler): void
+    {
+        $this->putRoutes[$path] = $handler;
+    }
+
+    public function delete(string $path, callable $handler): void
+    {
+        $this->deleteRoutes[$path] = $handler;
     }
 
     public function fallback(callable $handler): void
@@ -42,6 +63,21 @@ final class Router
 
         if ($method === 'POST' && isset($this->postRoutes[$uri])) {
             ($this->postRoutes[$uri])();
+            return;
+        }
+
+        if ($method === 'PUT' && isset($this->putRoutes[$uri])) {
+            ($this->putRoutes[$uri])();
+            return;
+        }
+
+        if ($method === 'DELETE' && isset($this->deleteRoutes[$uri])) {
+            ($this->deleteRoutes[$uri])();
+            return;
+        }
+
+        if ($method === 'PATCH' && isset($this->patchRoutes[$uri])) {
+            ($this->patchRoutes[$uri])();
             return;
         }
 

@@ -92,11 +92,51 @@ $router->post('/api/invitations', function () use ($app) {
     );
 });
 
+$router->get('/api/invitations/me', function () use ($app) {
+    return $app->authenticateUser()->mustAuthenticate(
+        function (RequestContext $ctx) use ($app) {
+            $app->invitationController()->handleGetInvitationsForRequester($ctx);
+        }
+    );
+});
+
+$router->get('/api/invitations/organizations', function () use ($app) {
+    return $app->authenticateUser()->mustAuthenticate(
+        function (RequestContext $ctx) use ($app) {
+            $app->invitationController()->handleSearchOrganizationMemberInvitation($ctx);
+        }
+    );
+});
+
+$router->put('/api/invitations/members', function () use ($app) {
+    return $app->authenticateUser()->mustAuthenticate(
+        function (RequestContext $ctx) use ($app) {
+            $app->invitationController()->handleAcceptOrganizationMembershipInvitation($ctx);
+        }
+    );
+});
+
+$router->delete('/api/invitations/members', function () use ($app) {
+    return $app->authenticateUser()->mustAuthenticate(
+        function (RequestContext $ctx) use ($app) {
+            $app->invitationController()->handleCancelOrganizationMembershipInvitation($ctx);
+        }
+    );
+});
+
+$router->patch('/api/invitations/members', function () use ($app) {
+    return $app->authenticateUser()->mustAuthenticate(
+        function (RequestContext $ctx) use ($app) {
+            $app->invitationController()->handleRejectOrganizationMembershipInvitation($ctx);
+        }
+    );
+});
+
 // 404 fallback
 $router->fallback(function () {
     http_response_code(404);
     header('Content-Type: application/json');
-    echo json_encode(['error' => 'Not Found']);
+    echo json_encode(['error' => 'Route Not Found']);
 });
 
 $router->dispatch();
