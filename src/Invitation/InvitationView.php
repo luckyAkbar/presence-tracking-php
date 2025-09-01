@@ -67,8 +67,6 @@ final class InvitationView implements \JsonSerializable
             $result['updated_at'],
             $result['deleted_at'],
         );
-
-        return $invitation;
     }
 
     public function jsonSerialize(): array
