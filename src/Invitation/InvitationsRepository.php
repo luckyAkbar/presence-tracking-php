@@ -23,7 +23,7 @@ final class InvitationsRepository
      * @param int $requester_id
      * @return Invitation|null
      */
-    public function create(int $intended_for_id, int $organization_id, int $created_by_id, string $status, \DateTime $expires_at): Invitation
+    public function create(int $intended_for_id, int $organization_id, int $created_by_id, string $status, \DateTime $expires_at): int
     {
         $sql = 'INSERT INTO invitations (
             organization_id,
@@ -53,7 +53,7 @@ final class InvitationsRepository
             throw new \Exception('Failed to create invitation');
         }
 
-        return $this->findById((int)$lastInsertId);
+        return (int)$lastInsertId;
     }
 
     /**

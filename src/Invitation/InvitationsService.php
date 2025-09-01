@@ -37,7 +37,7 @@ final class InvitationsService
      * @throws UnauthorizedAccessException
      * @throws \Exception
      */
-    public function createNewInvitation(RequestContext $ctx, string $target_email, int $organization_id): Invitation
+    public function createNewInvitation(RequestContext $ctx, string $target_email, int $organization_id): InvitationView
     {
         $requester = $ctx->getAuthenticatedUser();
         if ($requester === null) {
@@ -64,21 +64,20 @@ final class InvitationsService
         $existingInvitation = $this->invitationQueryService->findByIntendedUserEmail($target_email, $organization_id);
         if ($existingInvitation !== null) {
             switch ($existingInvitation->getStatus()) {
-                case Invitation::statusAccepted:
-                    return $existingInvitation;
-                case Invitation::statusPending:
-                    return $existingInvitation;
+                case Invitation::statusCancelled:
+                case Invitation::statusRejected:
+                    $this->invitationsRepository->updateStatus($existingInvitation->getId(), Invitation::statusPending, null);
+                    break;
                 default:
                     break;
             }
 
-            $this->invitationsRepository->updateStatus($existingInvitation->getId(), Invitation::statusPending, null);
-            $updatedInvitation = $this->invitationsRepository->findById($existingInvitation->getId());
-            if ($updatedInvitation === null) {
-                throw new \Exception('Failed to update invitation');
+            $invitationView = $this->invitationQueryService->findById($existingInvitation->getId());
+            if ($invitationView === null) {
+                throw new \Exception('Failed to find invitation');
             }
 
-            return $updatedInvitation;
+            return $invitationView;
         }
 
         $targetUser = $this->userRepository->findByEmail($target_email);
@@ -87,35 +86,49 @@ final class InvitationsService
         }
 
         $invitation_expired_at = new \DateTime('+14 days');
-        $invitation_status = 'pending';
-
-        $invitation = $this->invitationsRepository->create(
+        $invitationId = $this->invitationsRepository->create(
             $targetUser->getId(),
             $organization_id,
             $requesterId,
-            $invitation_status,
+            Invitation::statusPending,
             $invitation_expired_at
         );
-        if ($invitation === null) {
-            throw new \Exception('Failed to create invitation');
+
+        $invitationView = $this->invitationQueryService->findById($invitationId);
+        if ($invitationView === null) {
+            throw new \Exception('Failed to find invitation');
         }
 
-        return $invitation;
+        return $invitationView;
     }
 
-    public function getInvitationIntendedToUser(RequestContext $ctx): array
+    public function getInvitationIntendedToUser(RequestContext $ctx, int $limit, int $offset): array
     {
         $requester = $ctx->getAuthenticatedUser();
         if ($requester === null || $requester->getId() === null) {
             throw new UnauthorizedAccessException('This action requires an authenticated user');
         }
 
+        $limitQuery = 100;
+        $offsetQuery = 0;
+
+        if ($limit > 0 && $limit <= 100) {
+            $limitQuery = $limit;
+        }
+
+        if ($offset >= 0) {
+            $offsetQuery = $offset;
+        }
+
         $user_id = $requester->getId();
-        $invitations = $this->invitationsRepository->findByIntendedForId($user_id);
+        $invitations = $this->invitationQueryService->findInvitationsIntendedForUser(
+            $user_id,
+            $limitQuery,
+            $offsetQuery,
+        );
         if ($invitations === null) {
             throw new ResourceNotFoundException('Invitation not found');
         }
-
 
         return $invitations;
     }
@@ -157,7 +170,7 @@ final class InvitationsService
             'intended_for' => $target_user_id,
         ];
 
-        $invitations = $this->invitationsRepository->search($searchInvitationParams);
+        $invitations = $this->invitationQueryService->search($searchInvitationParams);
         if ($invitations === null) {
             throw new ResourceNotFoundException('No invitations found');
         }
