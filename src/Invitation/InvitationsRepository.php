@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Invitation;
 
 use App\Support\Db;
+use PDO;
 
 final class InvitationsRepository
 {
@@ -155,6 +156,26 @@ final class InvitationsRepository
         }
 
         return $invitations;
+    }
+
+    public function updateStatus(int $invitation_id, string $status, \PDO $pdo): void
+    {
+        $sql = 'UPDATE invitations SET status = :status, updated_at = NOW() WHERE id = :id';
+
+        $conn = $this->safeCreateConnection($pdo);
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['id' => $invitation_id, 'status' => $status]);
+
+        return;
+    }
+
+    public function safeCreateConnection(PDO|null $pdo): \PDO
+    {
+        if ($pdo === null) {
+            return $this->db->connection();
+        }
+
+        return $pdo;
     }
 
     /**

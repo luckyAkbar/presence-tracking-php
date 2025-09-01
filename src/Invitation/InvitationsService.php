@@ -10,12 +10,18 @@ use App\ServiceExceptions\ResourceNotFoundException;
 use App\User\UserRepository;
 use App\ServiceExceptions\UnauthorizedAccessException;
 use App\ServiceExceptions\ForbiddenAccessException;
+use App\Support\Transaction;
+use PDO;
+use App\Organization\OrganizationMemberRepository;
+use App\Organization\OrganizationMember;
 
 final class InvitationsService
 {
     public function __construct(
         private InvitationsRepository $invitationsRepository,
-        private UserRepository $userRepository
+        private UserRepository $userRepository,
+        private OrganizationMemberRepository $organizationMemberRepository,
+        private Transaction $transactionService
     ) {
     }
 
@@ -134,5 +140,64 @@ final class InvitationsService
         }
 
         return $invitations;
+    }
+
+    public function acceptOrganizationMembershipInvitation(RequestContext $ctx, int $invitation_id): OrganizationMember
+    {
+        $requester = $ctx->getAuthenticatedUser();
+        if ($requester === null || $requester->getId() === null) {
+            throw new UnauthorizedAccessException('This action requires an authenticated user');
+        }
+
+        $invitation = $this->invitationsRepository->findById($invitation_id);
+        if ($invitation === null) {
+            throw new ResourceNotFoundException('Invitation not found');
+        }
+
+        $userId = $requester->getId();
+        if ($userId !== $invitation->getIntendedForId()) {
+            throw new ForbiddenAccessException('You are not authorized to accept this invitation');
+        }
+
+        $operation = Invitation::operationAcceptInvitation;
+
+        if (!Invitation::isValidAcceptanceOperation($operation)) {
+            throw new InvalidArgumentException('Invalid operation');
+        }
+
+        if (!$invitation->isAcceptanceOperationValid($operation)) {
+            throw new ForbiddenAccessException('unable to perform ' . $operation . ' on a ' . $invitation->getStatus() . ' invitation');
+        }
+
+        if ($invitation->isExpired()) {
+            throw new ForbiddenAccessException('Invitation has expired');
+        }
+
+        $organizationMember = $this->transactionService->executeInTransaction(function(PDO $pdo) use ($invitation) {
+            $this->invitationsRepository->updateStatus(
+                $invitation->getId(),
+                Invitation::statusAccepted,
+                $pdo,
+            );
+
+            $organizationMember = $this->organizationMemberRepository->create(
+                $invitation->getOrganizationId(),
+                $invitation->getIntendedForId(),
+                $pdo,
+            );
+
+            if ($organizationMember === null) {
+                throw new \Exception('Failed to create organization member');
+            }
+
+            return $organizationMember;
+        });
+
+        // safe guard against null
+        if ($organizationMember === null) {
+            throw new \Exception('Failed to create organization member');
+        }
+
+        return $organizationMember;
     }
 }

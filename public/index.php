@@ -108,11 +108,19 @@ $router->get('/api/invitations/organizations', function () use ($app) {
     );
 });
 
+$router->put('/api/invitations/members', function () use ($app) {
+    return $app->authenticateUser()->mustAuthenticate(
+        function (RequestContext $ctx) use ($app) {
+            $app->invitationController()->handleAcceptOrganizationMembershipInvitation($ctx);
+        }
+    );
+});
+
 // 404 fallback
 $router->fallback(function () {
     http_response_code(404);
     header('Content-Type: application/json');
-    echo json_encode(['error' => 'Not Found']);
+    echo json_encode(['error' => 'Route Not Found']);
 });
 
 $router->dispatch();
