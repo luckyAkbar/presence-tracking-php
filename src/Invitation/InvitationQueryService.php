@@ -80,7 +80,7 @@ final class InvitationQueryService
         return InvitationView::fromQueryServiceResult($result);
     }
 
-    public function findInvitationsIntendedForUser(int $user_id, int $limit=100, int $offset=0, PDO|null $conn = null): array | null
+    public function findInvitationsIntendedForUser(int $user_id, int $limit=100, int $offset=0, PDO|null $conn = null): array|null
     {
         $sql = 'SELECT
             i.id,
@@ -129,7 +129,7 @@ final class InvitationQueryService
         return $invitations;
     }
 
-    public function search(array $search_params, PDO|null $conn = null): array | null
+    public function search(array $search_params, PDO|null $conn = null): array|null
     {
         $whereClauses = [];
         $params = [];

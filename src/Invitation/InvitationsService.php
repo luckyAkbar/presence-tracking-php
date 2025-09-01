@@ -67,6 +67,7 @@ final class InvitationsService
                 case Invitation::statusCancelled:
                 case Invitation::statusRejected:
                     $this->invitationsRepository->updateStatus($existingInvitation->getId(), Invitation::statusPending, null);
+                    break;
                 default:
                     break;
             }
