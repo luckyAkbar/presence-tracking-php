@@ -32,9 +32,9 @@ final class InvitationView implements \JsonSerializable
         int $invitee_id,
         string $invitee_name,
         string $invitation_status,
-        string|\DateTimeImmutable|null $expires_at,
-        string|\DateTimeImmutable|null $created_at,
-        string|\DateTimeImmutable|null $updated_at,
+        string|\DateTimeImmutable $expires_at,
+        string|\DateTimeImmutable $created_at,
+        string|\DateTimeImmutable $updated_at,
         string|\DateTimeImmutable|null $deleted_at,
     ) {
         $this->id = $id;
