@@ -76,6 +76,11 @@ final class Router
             return;
         }
 
+        if ($method === 'PATCH' && isset($this->patchRoutes[$uri])) {
+            ($this->patchRoutes[$uri])();
+            return;
+        }
+
         if ($this->fallbackHandler !== null) {
             ($this->fallbackHandler)();
             return;

@@ -257,5 +257,45 @@ final class InvitationsService
         }
 
         return $invitation;
-    }   
+    }
+
+    public function rejectOrganizationMembershipInvitation(RequestContext $ctx, int $invitation_id): Invitation
+    {
+        $requester = $ctx->getAuthenticatedUser();
+        if ($requester === null || $requester->getId() === null) {
+            throw new UnauthorizedAccessException('This action requires an authenticated user');
+        }
+        
+        $invitation = $this->invitationsRepository->findById($invitation_id);
+        if ($invitation === null) {
+            throw new ResourceNotFoundException('Invitation not found');
+        }
+
+        $userId = $requester->getId();
+        if ($invitation->getIntendedForId() !== $userId) {
+            throw new ForbiddenAccessException('You are not authorized to reject this invitation');
+        }
+
+        if ($invitation->getStatus() === Invitation::statusRejected) {
+            return $invitation;
+        }
+
+        $operation = Invitation::operationRejectInvitation;
+        if (!$invitation->isAcceptanceOperationValid($operation)) {
+            throw new ForbiddenAccessException('unable to perform ' . $operation . ' on a ' . $invitation->getStatus() . ' invitation');
+        }
+
+        $this->invitationsRepository->updateStatus($invitation->getId(), Invitation::statusRejected, null);
+
+        $rejectedInvitation = $this->invitationsRepository->findById($invitation_id);
+        if ($rejectedInvitation === null) {
+            throw new ResourceNotFoundException('Invitation not found');
+        }
+
+        if ($rejectedInvitation === null) {
+            throw new ResourceNotFoundException('Invitation not found');
+        }
+
+        return $rejectedInvitation;
+    }
 }
