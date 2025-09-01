@@ -21,6 +21,7 @@ final class InvitationsService
         private InvitationsRepository $invitationsRepository,
         private UserRepository $userRepository,
         private OrganizationMemberRepository $organizationMemberRepository,
+        private InvitationQueryService $invitationQueryService,
         private Transaction $transactionService
     ) {
     }
@@ -54,6 +55,30 @@ final class InvitationsService
 
         if (filter_var($target_email, FILTER_VALIDATE_EMAIL) === false) {
             throw new InvalidArgumentException('Invalid email address');
+        }
+
+        // if there is an existing invitation to the user and
+        // it is possible to reinvite the user, will update the
+        // invitation to be pending. otherwise, just return the
+        // existing invitation.
+        $existingInvitation = $this->invitationQueryService->findByIntendedUserEmail($target_email, $organization_id);
+        if ($existingInvitation !== null) {
+            switch ($existingInvitation->getStatus()) {
+                case Invitation::statusAccepted:
+                    return $existingInvitation;
+                case Invitation::statusPending:
+                    return $existingInvitation;
+                default:
+                    break;
+            }
+
+            $this->invitationsRepository->updateStatus($existingInvitation->getId(), Invitation::statusPending, null);
+            $updatedInvitation = $this->invitationsRepository->findById($existingInvitation->getId());
+            if ($updatedInvitation === null) {
+                throw new \Exception('Failed to update invitation');
+            }
+
+            return $updatedInvitation;
         }
 
         $targetUser = $this->userRepository->findByEmail($target_email);
