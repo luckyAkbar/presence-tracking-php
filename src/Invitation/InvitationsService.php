@@ -114,13 +114,11 @@ final class InvitationsService
             $statuses = Invitation::getAllValidStatuses();
         }
 
-        $target_email = $search_params['target_email'] ?? null;
         $target_user_id = null;
-
-        if ($target_email !== null) {
-            $target_user_id = $this->userRepository->findByEmail($target_email);
+        if (!empty($search_params['target_email'])) {
+            $target_user_id = $this->userRepository->findByEmail($search_params['target_email']);
             if ($target_user_id === null) {
-                throw new ResourceNotFoundException('Target user with email ' . $target_email . ' not found');
+                throw new ResourceNotFoundException('Target user with email ' . $search_params['target_email'] . ' not found');
             }
 
             $target_user_id = $target_user_id->getId();

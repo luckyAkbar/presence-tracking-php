@@ -80,9 +80,9 @@ final class InvitationController
         $limit = $data['limit'] ?? 100;
         $offset = $data['offset'] ?? 0;
         $statuses = $data['statuses'] ?? null;
-        $target_email = $data['target_email'] ?? null;
+        $target_email = $data['target_email'] ?? '';
 
-        if (filter_var($target_email, FILTER_VALIDATE_EMAIL) === false) {
+        if ($target_email !== '' && filter_var($target_email, FILTER_VALIDATE_EMAIL) === false) {
             http_response_code(400);
             echo json_encode([
                 'error' => 'Bad request',
