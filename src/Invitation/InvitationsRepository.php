@@ -158,7 +158,7 @@ final class InvitationsRepository
         return $invitations;
     }
 
-    public function updateStatus(int $invitation_id, string $status, \PDO $pdo): void
+    public function updateStatus(int $invitation_id, string $status, \PDO|null $pdo): void
     {
         $sql = 'UPDATE invitations SET status = :status, updated_at = NOW() WHERE id = :id';
 

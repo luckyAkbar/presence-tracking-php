@@ -116,6 +116,14 @@ $router->put('/api/invitations/members', function () use ($app) {
     );
 });
 
+$router->delete('/api/invitations/members', function () use ($app) {
+    return $app->authenticateUser()->mustAuthenticate(
+        function (RequestContext $ctx) use ($app) {
+            $app->invitationController()->handleCancelOrganizationMembershipInvitation($ctx);
+        }
+    );
+});
+
 // 404 fallback
 $router->fallback(function () {
     http_response_code(404);

@@ -200,4 +200,39 @@ final class InvitationsService
 
         return $organizationMember;
     }
+
+    public function cancelOrganizationMembershipInvitation(RequestContext $ctx, int $invitation_id): Invitation
+    {
+        $requester = $ctx->getAuthenticatedUser();
+        if ($requester === null || $requester->getId() === null) {
+            throw new UnauthorizedAccessException('This action requires an authenticated user');
+        }
+        
+        $invitation = $this->invitationsRepository->findById($invitation_id);
+        if ($invitation === null) {
+            throw new ResourceNotFoundException('Invitation not found');
+        }
+
+        if (!$requester->isAdminOfOrganization($invitation->getOrganizationId())) {
+            throw new ForbiddenAccessException('You are not authorized to cancel this invitation');
+        }
+
+        if ($invitation->getStatus() === Invitation::statusCancelled) {
+            return $invitation;
+        }
+
+        $operation = Invitation::operationCancelInvitation;
+        if (!$invitation->isAcceptanceOperationValid($operation)) {
+            throw new ForbiddenAccessException('unable to perform ' . $operation . ' on a ' . $invitation->getStatus() . ' invitation');
+        }
+
+        $this->invitationsRepository->updateStatus($invitation->getId(), Invitation::statusCancelled, null);
+
+        $invitation = $this->invitationsRepository->findById($invitation_id);
+        if ($invitation === null) {
+            throw new ResourceNotFoundException('Invitation not found');
+        }
+
+        return $invitation;
+    }   
 }

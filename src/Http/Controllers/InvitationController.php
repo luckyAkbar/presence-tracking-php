@@ -140,6 +140,39 @@ final class InvitationController
         }, $ctx);
     }
 
+    public function handleCancelOrganizationMembershipInvitation(RequestContext $ctx): void
+    {
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+        
+        if ($data === null) {
+            http_response_code(400);
+            echo json_encode([
+                'error' => 'Bad request',
+                'message' => 'missing required body requests',
+            ]);
+            return;
+        }
+    
+        $invitation_id = $data['invitation_id'];
+
+        if ($invitation_id === null or $invitation_id <= 0) {
+            http_response_code(400);
+            echo json_encode([
+                'error' => 'Bad request',
+                'message' => 'invitation_id is required and must be greater than 0',
+            ]);
+            return;
+        }
+
+        $this->safeExecute(function(RequestContext $ctx) use ($invitation_id) {
+            $invitation = $this->invitationService->cancelOrganizationMembershipInvitation($ctx, $invitation_id);
+
+            http_response_code(200);
+            echo json_encode($invitation);
+        }, $ctx);
+    }
+
     private function safeExecute(callable $handler, RequestContext $ctx): void
     {
         try {
