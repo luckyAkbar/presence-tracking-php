@@ -19,6 +19,7 @@ use App\Invitation\InvitationsRepository;
 use App\Http\Controllers\InvitationController;
 use App\Invitation\InvitationsService;
 use App\Organization\OrganizationMemberRepository;
+use App\Invitation\InvitationQueryService;
 
 /**
  * Service Provider - Configures dependency injection
@@ -83,6 +84,7 @@ final class ServiceProvider
                 $container->make(InvitationsRepository::class),
                 $container->make(UserRepository::class),
                 $container->make(OrganizationMemberRepository::class),
+                $container->make(InvitationQueryService::class),
                 $container->make(Transaction::class)
             );
         });
@@ -108,6 +110,11 @@ final class ServiceProvider
         // Transaction
         $container->bind(Transaction::class, function(Container $container) {
             return new Transaction($container->make(Db::class));
+        });
+
+        // Query Services
+        $container->bind(InvitationQueryService::class, function(Container $container) {
+            return new InvitationQueryService($container->make(Db::class), $container->make(EmailEncryption::class));
         });
     }
 }
