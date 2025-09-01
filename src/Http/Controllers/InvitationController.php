@@ -99,7 +99,7 @@ final class InvitationController
         ];
         
 
-        $this->safeExecute(function(RequestContext $ctx) use ($organization_id,$search_params) {
+        $this->safeExecute(function(RequestContext $ctx) use ($organization_id, $search_params) {
             $invitations = $this->invitationService->searchOrganizationMemberInvitation($ctx, $organization_id, $search_params);
 
             http_response_code(200);
@@ -123,7 +123,7 @@ final class InvitationController
         
         $invitation_id = $data['invitation_id'];
 
-        if ($invitation_id === null or $invitation_id <= 0) {
+        if ($invitation_id === null || $invitation_id <= 0) {
             http_response_code(400);
             echo json_encode([
                 'error' => 'Bad request',
@@ -156,7 +156,7 @@ final class InvitationController
     
         $invitation_id = $data['invitation_id'];
 
-        if ($invitation_id === null or $invitation_id <= 0) {
+        if ($invitation_id === null || $invitation_id <= 0) {
             http_response_code(400);
             echo json_encode([
                 'error' => 'Bad request',
@@ -178,7 +178,6 @@ final class InvitationController
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
         
-        
         if ($data === null) {
             http_response_code(400);
             echo json_encode([
@@ -190,7 +189,7 @@ final class InvitationController
         
         $invitation_id = $data['invitation_id'];
 
-        if ($invitation_id === null or $invitation_id <= 0) {
+        if ($invitation_id === null || $invitation_id <= 0) {
             http_response_code(400);
             echo json_encode([
                 'error' => 'Bad request',

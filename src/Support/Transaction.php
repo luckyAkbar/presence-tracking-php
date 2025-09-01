@@ -10,7 +10,7 @@ final class Transaction
         private Db $db
     ) {}
 
-    public function executeInTransaction(callable $callback)
+    public function executeInTransaction(callable $callback): mixed
     {
         $pdo = $this->db->connection();
         

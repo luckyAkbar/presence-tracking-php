@@ -292,10 +292,6 @@ final class InvitationsService
             throw new ResourceNotFoundException('Invitation not found');
         }
 
-        if ($rejectedInvitation === null) {
-            throw new ResourceNotFoundException('Invitation not found');
-        }
-
         return $rejectedInvitation;
     }
 }
